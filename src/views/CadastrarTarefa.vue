@@ -2,13 +2,23 @@
     <v-sheet class="mx-auto" width="50%">
 
         <v-form ref="form">
-            <v-text-field v-model="name" :rules="nameRules" label="Nome da tarefa" variant="solo"
+            <v-text-field v-model="nome" :rules="nameRules" label="Nome da tarefa" variant="solo"
                 required></v-text-field>
 
-            <v-textarea label="Descrição" variant="solo"></v-textarea>
+            <v-textarea v-model="descricao" label="Descrição" variant="solo"></v-textarea>
 
-            <v-select v-model="select" :items="items" :rules="[v => !!v || 'Item is required']" label="Item" required
-                variant="solo"></v-select>
+            <v-select 
+                v-model="atribuicao" 
+                :items="atribuicoes" 
+                item-title="nome" 
+                item-value="id" 
+                label="Atribuir para:" 
+                return-object
+                required variant="solo"
+                single-line
+                persistent-hint
+
+            ></v-select>
 
 
             <div class="d-flex flex-column">
@@ -60,14 +70,19 @@ export default {
                 title: 'Work',
             },
         ],
+        atribuicoes: [
+        ],
+        nome: null,
+        descricao: null,
+        atribuicao: {id: null, nome: null}
     }),
     methods: {
         cadastrar() {
             // dados a serem enviados pela solicitação POST
             let _data = {
-                title: "foo",
-                body: "bar",
-                userId: 1
+                nome: this.nome,
+                descricao: this.descricao,
+                atribuicao: this.atribuicao.id
             }
 
             fetch('http://127.0.0.1:8000/cadastrar-tarefa', {
