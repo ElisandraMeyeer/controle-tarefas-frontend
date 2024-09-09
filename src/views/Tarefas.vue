@@ -12,10 +12,10 @@
         <v-list lines="two">
             <v-list-subheader inset>Para mim</v-list-subheader>
 
-            <v-list-item v-for="folder in folders" :key="folder.title" style="margin-left: 5rem;" >
+            <v-list-item v-for="tarefa in minhasTarefas" :key="tarefa.nome" style="margin-left: 5rem;" >
                 <v-expansion-panels variant="accordion">
-                    <v-expansion-panel title="Title"
-                        text="Lorem ipsum dolor sit amet consectetur adipisicing elit. Commodi, ratione debitis quis est labore voluptatibus! Eaque cupiditate minima">
+                    <v-expansion-panel :title="tarefa.nome"
+                        :text="tarefa.descricao">
                     </v-expansion-panel>
                 </v-expansion-panels>
 
@@ -56,19 +56,8 @@
 
 export default {
     data: () => ({
-        files: [
-            {
-                color: 'blue',
-                icon: 'mdi-clipboard-text',
-                subtitle: 'Jan 20, 2014',
-                title: 'Vacation itinerary',
-            },
-            {
-                color: 'amber',
-                icon: 'mdi-gesture-tap-button',
-                subtitle: 'Jan 10, 2014',
-                title: 'Kitchen remodel',
-            },
+        minhasTarefas: [
+            
         ],
         folders: [
             {
@@ -85,69 +74,30 @@ export default {
             },
         ],
     }),
+    methods: {
+        buscarTarefasUsuario(){
+            const token = localStorage.getItem('userToken');
+
+            fetch('http://127.0.0.1:8000/buscar-tarefas-usuario', {
+                method: "GET",
+                headers: {
+                'Authorization': `Token ${token}`,
+                'Content-Type': 'application/json',
+            },
+            })
+                .then(response => response.json())
+                .then(json => this.minhasTarefas = json)
+                .catch(err => console.log(err));
+        }
+    },
+    mounted() {
+        alert()
+
+        this.buscarTarefasUsuario();
+    },
 }
 </script>
 
 <style scoped>
-header {
-    line-height: 1.5;
-    max-height: 100vh;
-}
 
-.logo {
-    display: block;
-    margin: 0 auto 2rem;
-}
-
-nav {
-    width: 100%;
-    font-size: 12px;
-    text-align: center;
-    margin-top: 2rem;
-}
-
-nav a.router-link-exact-active {
-    color: var(--color-text);
-}
-
-nav a.router-link-exact-active:hover {
-    background-color: transparent;
-}
-
-nav a {
-    display: inline-block;
-    padding: 0 1rem;
-    border-left: 1px solid var(--color-border);
-}
-
-nav a:first-of-type {
-    border: 0;
-}
-
-@media (min-width: 1024px) {
-    header {
-        display: flex;
-        place-items: center;
-        padding-right: calc(var(--section-gap) / 2);
-    }
-
-    .logo {
-        margin: 0 2rem 0 0;
-    }
-
-    header .wrapper {
-        display: flex;
-        place-items: flex-start;
-        flex-wrap: wrap;
-    }
-
-    nav {
-        text-align: left;
-        margin-left: -1rem;
-        font-size: 1rem;
-
-        padding: 1rem 0;
-        margin-top: 1rem;
-    }
-}
 </style>

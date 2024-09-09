@@ -1,6 +1,5 @@
 <template>
-    <v-sheet class="mx-auto" width="50%">
-
+    <v-sheet class="mx-auto" width="50%" style="margin-top: 15%;">
         <v-form ref="form">
             <v-text-field v-model="nome" :rules="nameRules" label="Nome da tarefa" variant="solo"
                 required></v-text-field>
@@ -10,23 +9,19 @@
             <v-select 
                 v-model="atribuicao" 
                 :items="atribuicoes" 
-                item-title="nome" 
+                item-title="usuario" 
                 item-value="id" 
-                label="Atribuir para:" 
-                return-object
-                required variant="solo"
-                single-line
-                persistent-hint
-
+                label="Atribuir para:"
+                return-object 
+                required variant="solo" 
             ></v-select>
-
 
             <div class="d-flex flex-column">
                 <v-btn class="mt-4" color="success" block @click="cadastrar" to="/tarefas">
                     Cadastrar
                 </v-btn>
 
-                <v-btn class="mt-4" color="error" block @click="reset">
+                <v-btn class="mt-4" color="error" block @click="limpar">
                     Limpar
                 </v-btn>
 
@@ -42,39 +37,11 @@
 <script>
 export default {
     data: () => ({
-        files: [
-            {
-                color: 'blue',
-                icon: 'mdi-clipboard-text',
-                subtitle: 'Jan 20, 2014',
-                title: 'Vacation itinerary',
-            },
-            {
-                color: 'amber',
-                icon: 'mdi-gesture-tap-button',
-                subtitle: 'Jan 10, 2014',
-                title: 'Kitchen remodel',
-            },
-        ],
-        folders: [
-            {
-                subtitle: 'Jan 9, 2014',
-                title: 'Photos',
-            },
-            {
-                subtitle: 'Jan 17, 2014',
-                title: 'Recipes',
-            },
-            {
-                subtitle: 'Jan 28, 2014',
-                title: 'Work',
-            },
-        ],
         atribuicoes: [
         ],
         nome: null,
         descricao: null,
-        atribuicao: {id: null, nome: null}
+        atribuicao: { id: null, usuario: null }
     }),
     methods: {
         cadastrar() {
@@ -84,81 +51,46 @@ export default {
                 descricao: this.descricao,
                 atribuicao: this.atribuicao.id
             }
+            const token = localStorage.getItem('userToken');
+
 
             fetch('http://127.0.0.1:8000/cadastrar-tarefa', {
                 method: "POST",
                 body: JSON.stringify(_data),
-                headers: { "Content-type": "application/json; charset=UTF-8" }
+                headers: {
+                'Authorization': `Token ${token}`,
+                'Content-Type': 'application/json',
+            }
             })
                 .then(response => response.json())
                 .then(json => console.log(json))
                 .catch(err => console.log(err));
-            alert()
-    }
-}
+        },
+        buscarAtribuicoes() {
+            const token = localStorage.getItem('userToken');
+
+            fetch('http://127.0.0.1:8000/buscar-usuarios', {
+                method: "GET",
+                headers: {
+                'Authorization': `Token ${token}`,
+                'Content-Type': 'application/json',
+            }
+            })
+                .then(response => response.json())
+                .then(json => this.atribuicoes = json)
+                .catch(err => console.log(err));
+        },
+        limpar(){
+            this.nome = null;
+            this.descricao = null;
+            this.atribuicao = { id: null, usuario: null };
+        }
+    },
+    mounted() {
+        this.buscarAtribuicoes();
+    },
 }
 </script>
 
 <style scoped>
-header {
-    line-height: 1.5;
-    max-height: 100vh;
-}
-
-.logo {
-    display: block;
-    margin: 0 auto 2rem;
-}
-
-nav {
-    width: 100%;
-    font-size: 12px;
-    text-align: center;
-    margin-top: 2rem;
-}
-
-nav a.router-link-exact-active {
-    color: var(--color-text);
-}
-
-nav a.router-link-exact-active:hover {
-    background-color: transparent;
-}
-
-nav a {
-    display: inline-block;
-    padding: 0 1rem;
-    border-left: 1px solid var(--color-border);
-}
-
-nav a:first-of-type {
-    border: 0;
-}
-
-@media (min-width: 1024px) {
-    header {
-        display: flex;
-        place-items: center;
-        padding-right: calc(var(--section-gap) / 2);
-    }
-
-    .logo {
-        margin: 0 2rem 0 0;
-    }
-
-    header .wrapper {
-        display: flex;
-        place-items: flex-start;
-        flex-wrap: wrap;
-    }
-
-    nav {
-        text-align: left;
-        margin-left: -1rem;
-        font-size: 1rem;
-
-        padding: 1rem 0;
-        margin-top: 1rem;
-    }
-}
 </style>
