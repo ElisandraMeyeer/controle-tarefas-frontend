@@ -20,9 +20,6 @@
     >
     {{ snackbar.message }}
     </v-snackbar>
-
-
-
 </template>
 
 

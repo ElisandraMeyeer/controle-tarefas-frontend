@@ -1,21 +1,27 @@
 <template>
+    <v-toolbar density="compact" color="orange-lighten-1">
+        <v-toolbar-title>
+            <span style="color: white;">Controle de tarefas</span>
+        </v-toolbar-title>
+
+        <v-spacer></v-spacer>
+        <v-btn icon>
+            <svg-icon type="mdi" :path="pathLogout" color="white" @click="logout"></svg-icon>
+        </v-btn>
+    </v-toolbar>
+
     <v-card class="mx-auto mt-5" max-width="70%">
-        <v-toolbar color="orange-lighten-1">
-            <v-btn icon="mdi-menu" variant="text"></v-btn>
-
+        <v-toolbar color="orange-lighten-3">
+            <svg-icon type="mdi" :path="pathList" class="ml-2"></svg-icon>
             <v-toolbar-title>Tarefas</v-toolbar-title>
-
-            <v-spacer></v-spacer>
-
         </v-toolbar>
 
         <v-list lines="two">
-            <v-list-subheader inset>Para mim</v-list-subheader>
+            <v-list-subheader inset style="font-size: large;">Para mim</v-list-subheader>
 
-            <v-list-item v-for="tarefa in minhasTarefas" :key="tarefa.nome" style="margin-left: 5rem;" >
-                <v-expansion-panels variant="accordion">
-                    <v-expansion-panel :title="tarefa.nome"
-                        :text="tarefa.descricao">
+            <v-list-item v-for="tarefa in minhasTarefas" :key="tarefa.nome" style="margin-left: 5rem;">
+                <v-expansion-panels class="my-1" variant="inset">
+                    <v-expansion-panel :title="tarefa.nome" :text="tarefa.descricao">
                     </v-expansion-panel>
                 </v-expansion-panels>
 
@@ -26,12 +32,11 @@
 
             <v-divider inset></v-divider>
 
-            <v-list-subheader inset>Todos</v-list-subheader>
+            <v-list-subheader inset style="font-size: large;">Todos</v-list-subheader>
 
-            <v-list-item v-for="file in files" :key="file.title"  style="margin-left: 5rem;" >
-                <v-expansion-panels variant="accordion">
-                    <v-expansion-panel title="Title"
-                        text="Lorem ipsum dolor sit amet consectetur adipisicing elit. Commodi, ratione debitis quis est labore voluptatibus! Eaque cupiditate minima">
+            <v-list-item v-for="tarefa in tarefasTodos" :key="tarefa.nome" style="margin-left: 5rem;">
+                <v-expansion-panels class="my-1" variant="inset">
+                    <v-expansion-panel :title="tarefa.nome" :text="tarefa.descricao">
                     </v-expansion-panel>
                 </v-expansion-panels>
 
@@ -44,7 +49,8 @@
 
     <div style="display: flex; justify-content: center;">
         <v-col cols="12" md="4" sm="6">
-            <v-btn rounded="xl" size="x-large" block to="/cadastrar-tarefa" color="orange-darken-1" >CADASTRAR TAREFA</v-btn>
+            <v-btn rounded="xl" size="x-large" block to="/cadastrar-tarefa" color="orange-darken-1">CADASTRAR
+                TAREFA</v-btn>
         </v-col>
     </div>
 
@@ -53,12 +59,16 @@
 
 
 <script>
+import SvgIcon from '@jamescoyle/vue-icon';
+import { mdiLogout, mdiFormatListBulleted } from '@mdi/js';
 
 export default {
+    components: {
+        SvgIcon
+    },
     data: () => ({
-        minhasTarefas: [
-            
-        ],
+        minhasTarefas: [],
+        tarefasTodos: [],
         folders: [
             {
                 subtitle: 'Jan 9, 2014',
@@ -73,31 +83,66 @@ export default {
                 title: 'Work',
             },
         ],
+        pathLogout: mdiLogout,
+        pathList: mdiFormatListBulleted,
+
     }),
     methods: {
-        buscarTarefasUsuario(){
+        buscarTarefasUsuario() {
             const token = localStorage.getItem('userToken');
 
             fetch('http://127.0.0.1:8000/buscar-tarefas-usuario', {
                 method: "GET",
                 headers: {
-                'Authorization': `Token ${token}`,
-                'Content-Type': 'application/json',
-            },
+                    'Authorization': `Token ${token}`,
+                    'Content-Type': 'application/json',
+                },
             })
-                .then(response => response.json())
-                .then(json => this.minhasTarefas = json)
-                .catch(err => console.log(err));
+            .then(response => {
+                if(response.statusText === 'Unauthorized'){
+                    this.$router.push('/');
+                }
+                response.json().then(json => this.minhasTarefas = json);
+            })
+            .catch(err => console.log(err));
+        },
+        buscarTarefasTodos() {
+            const token = localStorage.getItem('userToken');
+
+            fetch('http://127.0.0.1:8000/buscar-tarefas-todos', {
+                method: "GET",
+                headers: {
+                    'Authorization': `Token ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => {
+                if(response.statusText === 'Unauthorized'){
+                    this.$router.push('/');
+                }
+                response.json().then(json => this.tarefasTodos = json);
+            })
+            .catch(err => console.log(err));
+        },
+        logout() {
+            const token = localStorage.getItem('userToken');
+
+            fetch('http://127.0.0.1:8000/logout', {
+                method: "POST",
+                headers: {
+                    'Authorization': `Token ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(this.$router.push('/'))
+            .catch(err => console.log(err));
         }
     },
     mounted() {
-        alert()
-
         this.buscarTarefasUsuario();
+        this.buscarTarefasTodos();
     },
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>
