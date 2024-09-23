@@ -6,7 +6,7 @@
 
         <v-spacer></v-spacer>
         <v-btn icon>
-            <svg-icon type="mdi" :path="pathLogout" color="white"></svg-icon>
+            <svg-icon type="mdi" :path="pathLogout" color="white" @click="logout"></svg-icon>
         </v-btn>
     </v-toolbar>
     <v-sheet class="mx-auto" width="50%" style="margin-top: 10%;">
@@ -68,7 +68,7 @@ export default {
             const token = localStorage.getItem('userToken');
 
 
-            fetch('http://127.0.0.1:8000/cadastrar-tarefa', {
+            fetch('https://controle-tarefas-backend-production.up.railway.app/cadastrar-tarefa', {
                 method: "POST",
                 body: JSON.stringify(_data),
                 headers: {
@@ -83,7 +83,7 @@ export default {
         buscarAtribuicoes() {
             const token = localStorage.getItem('userToken');
 
-            fetch('http://127.0.0.1:8000/buscar-usuarios', {
+            fetch('https://controle-tarefas-backend-production.up.railway.app/buscar-usuarios', {
                 method: "GET",
                 headers: {
                     'Authorization': `Token ${token}`,
@@ -106,7 +106,20 @@ export default {
             this.nome = null;
             this.descricao = null;
             this.atribuicao = { id: null, usuario: null };
-        }
+        },
+        logout() {
+            const token = localStorage.getItem('userToken');
+
+            fetch('https://controle-tarefas-backend-production.up.railway.app/logout', {
+                method: "POST",
+                headers: {
+                    'Authorization': `Token ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            })
+                .then(this.$router.push('/'))
+                .catch(err => console.log(err));
+        },
     },
     mounted() {
         this.buscarAtribuicoes();

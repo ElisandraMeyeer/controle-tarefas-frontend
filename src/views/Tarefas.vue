@@ -10,13 +10,13 @@
         </v-btn>
     </v-toolbar>
 
-    <v-card class="mx-auto mt-5" max-width="70%">
+    <v-card class="mx-auto mt-5" max-width="70%" max-height="50%">
         <v-toolbar color="orange-lighten-3">
             <svg-icon type="mdi" :path="pathList" class="ml-2"></svg-icon>
             <v-toolbar-title>Tarefas</v-toolbar-title>
         </v-toolbar>
 
-        <v-list lines="two">
+        <v-list lines="two" height="50vw" style="overflow: auto;">
             <v-list-subheader inset style="font-size: large;">Para mim</v-list-subheader>
 
             <v-list-item v-for="tarefa in minhasTarefas" :key="tarefa.nome" style="margin-left: 5rem;">
@@ -26,7 +26,7 @@
                 </v-expansion-panels>
 
                 <template v-slot:append>
-                    <v-btn color="orange-darken-1" variant="text">Concluir</v-btn>
+                    <v-btn color="orange-darken-1" variant="text" @click="concluir(tarefa)">Concluir</v-btn>
                 </template>
             </v-list-item>
 
@@ -41,7 +41,7 @@
                 </v-expansion-panels>
 
                 <template v-slot:append>
-                    <v-btn color="orange-darken-1" variant="text">Concluir</v-btn>
+                    <v-btn color="orange-darken-1" variant="text" @click="concluir(tarefa, 'todos')">Concluir</v-btn>
                 </template>
             </v-list-item>
         </v-list>
@@ -91,51 +91,79 @@ export default {
         buscarTarefasUsuario() {
             const token = localStorage.getItem('userToken');
 
-            fetch('http://127.0.0.1:8000/buscar-tarefas-usuario', {
+
+            fetch('https://controle-tarefas-backend-production.up.railway.app/buscar-tarefas-usuario', {
                 method: "GET",
                 headers: {
                     'Authorization': `Token ${token}`,
                     'Content-Type': 'application/json',
                 },
             })
-            .then(response => {
-                if(response.statusText === 'Unauthorized'){
-                    this.$router.push('/');
-                }
-                response.json().then(json => this.minhasTarefas = json);
-            })
-            .catch(err => console.log(err));
+                .then(response => {
+                    if (response.statusText === 'Unauthorized') {
+                        this.$router.push('/');
+                    }
+                    response.json().then(json => this.minhasTarefas = json);
+                })
+                .catch(err => console.log(err));
         },
         buscarTarefasTodos() {
             const token = localStorage.getItem('userToken');
 
-            fetch('http://127.0.0.1:8000/buscar-tarefas-todos', {
+            fetch('https://controle-tarefas-backend-production.up.railway.app/buscar-tarefas-todos', {
                 method: "GET",
                 headers: {
                     'Authorization': `Token ${token}`,
                     'Content-Type': 'application/json',
                 },
             })
-            .then(response => {
-                if(response.statusText === 'Unauthorized'){
-                    this.$router.push('/');
-                }
-                response.json().then(json => this.tarefasTodos = json);
-            })
-            .catch(err => console.log(err));
+                .then(response => {
+                    if (response.statusText === 'Unauthorized') {
+                        this.$router.push('/');
+                    }
+                    response.json().then(json => this.tarefasTodos = json);
+                })
+                .catch(err => console.log(err));
         },
         logout() {
             const token = localStorage.getItem('userToken');
 
-            fetch('http://127.0.0.1:8000/logout', {
+            fetch('https://controle-tarefas-backend-production.up.railway.app/logout', {
                 method: "POST",
                 headers: {
                     'Authorization': `Token ${token}`,
                     'Content-Type': 'application/json',
                 },
             })
-            .then(this.$router.push('/'))
-            .catch(err => console.log(err));
+                .then(this.$router.push('/'))
+                .catch(err => console.log(err));
+        },
+        concluir(tarefa, tipo) {
+            const token = localStorage.getItem('userToken');
+
+            const data = {
+                id: tarefa.id,
+                tipo: tipo === "todos" ? tipo : "individual"
+            }
+
+            fetch('https://controle-tarefas-backend-production.up.railway.app/concluir-tarefa', {
+                method: "POST",
+                body: JSON.stringify(data),
+                headers: {
+                    'Authorization': `Token ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            })
+                .then(response => {
+                    if (response.statusText === 'Unauthorized') {
+                        this.$router.push('/');
+                    }
+                    response.json().then(json => {
+                        this.buscarTarefasUsuario()
+                        this.buscarTarefasTodos()
+                    });
+                })
+                .catch(err => console.log(err));
         }
     },
     mounted() {
