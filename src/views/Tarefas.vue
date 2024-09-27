@@ -16,7 +16,7 @@
             <v-toolbar-title>Tarefas</v-toolbar-title>
         </v-toolbar>
 
-        <v-list lines="two" height="50vw" style="overflow: auto;">
+        <v-list lines="two" max-height="50vw" style="overflow: auto;">
             <v-list-subheader inset style="font-size: large;">Para mim</v-list-subheader>
 
             <v-list-item v-for="tarefa in minhasTarefas" :key="tarefa.nome" style="margin-left: 5rem;">
@@ -92,7 +92,7 @@ export default {
             const token = localStorage.getItem('userToken');
 
 
-            fetch('https://controle-tarefas-backend-production.up.railway.app/buscar-tarefas-usuario', {
+            fetch(import.meta.env.VITE_API_URL + 'buscar-tarefas-usuario', {
                 method: "GET",
                 headers: {
                     'Authorization': `Token ${token}`,
@@ -110,7 +110,7 @@ export default {
         buscarTarefasTodos() {
             const token = localStorage.getItem('userToken');
 
-            fetch('https://controle-tarefas-backend-production.up.railway.app/buscar-tarefas-todos', {
+            fetch(import.meta.env.VITE_API_URL + 'buscar-tarefas-todos', {
                 method: "GET",
                 headers: {
                     'Authorization': `Token ${token}`,
@@ -128,7 +128,7 @@ export default {
         logout() {
             const token = localStorage.getItem('userToken');
 
-            fetch('https://controle-tarefas-backend-production.up.railway.app/logout', {
+            fetch(import.meta.env.VITE_API_URL + 'logout', {
                 method: "POST",
                 headers: {
                     'Authorization': `Token ${token}`,
@@ -146,7 +146,7 @@ export default {
                 tipo: tipo === "todos" ? tipo : "individual"
             }
 
-            fetch('https://controle-tarefas-backend-production.up.railway.app/concluir-tarefa', {
+            fetch(import.meta.env.VITE_API_URL + 'concluir-tarefa', {
                 method: "POST",
                 body: JSON.stringify(data),
                 headers: {

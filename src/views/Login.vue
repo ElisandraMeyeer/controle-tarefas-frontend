@@ -44,7 +44,7 @@ export default {
     }),
     methods: {
         login() {
-            fetch('https://controle-tarefas-backend-production.up.railway.app/api-token-auth/', {
+            fetch(import.meta.env.VITE_API_URL + 'api-token-auth/', {
                 method: "POST",
                 body: JSON.stringify({
                     username: this.usuario,

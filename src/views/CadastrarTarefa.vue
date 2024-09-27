@@ -59,7 +59,6 @@ export default {
     }),
     methods: {
         cadastrar() {
-            // dados a serem enviados pela solicitação POST
             let _data = {
                 nome: this.nome,
                 descricao: this.descricao,
@@ -68,7 +67,7 @@ export default {
             const token = localStorage.getItem('userToken');
 
 
-            fetch('https://controle-tarefas-backend-production.up.railway.app/cadastrar-tarefa', {
+            fetch(import.meta.env.VITE_API_URL + '/cadastrar-tarefa', {
                 method: "POST",
                 body: JSON.stringify(_data),
                 headers: {
@@ -83,7 +82,7 @@ export default {
         buscarAtribuicoes() {
             const token = localStorage.getItem('userToken');
 
-            fetch('https://controle-tarefas-backend-production.up.railway.app/buscar-usuarios', {
+            fetch(import.meta.env.VITE_API_URL + '/buscar-usuarios', {
                 method: "GET",
                 headers: {
                     'Authorization': `Token ${token}`,
@@ -110,7 +109,7 @@ export default {
         logout() {
             const token = localStorage.getItem('userToken');
 
-            fetch('https://controle-tarefas-backend-production.up.railway.app/logout', {
+            fetch(import.meta.env.VITE_API_URL + 'logout', {
                 method: "POST",
                 headers: {
                     'Authorization': `Token ${token}`,
